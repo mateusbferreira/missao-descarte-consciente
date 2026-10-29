@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Missão: Descarte Consciente</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Site educativo sobre o descarte correto de medicamentos, com quiz interativo. TCC do curso técnico em Farmácia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap">
+<style>
+/* Layout: HUD fixo no topo + fases empilhadas (Início → Aprender → Quiz → Coleta → Fontes);
+   painéis com cantos pixelados sobre um céu noturno, no estilo de RPG retrô. Visual escuro único, por escolha. */
+:root {
+  color-scheme: dark;
+  --bg: #110d1b;
+  --bg-2: #181226;
+  --sky-2: #1b1530;
+  --panel: #1e1730;
+  --panel-2: #2a2042;
+  --line: #43356a;
+  --line-hi: #6b58a3;
+  --ink: #f1e7d0;
+  --muted: #aba1c6;
+  --sun: #ffd65a;
+  --sun-deep: #b8861a;
+  --on-sun: #1b1306;
+  --amber: #f0a040;
+  --ok: #5fd08a;
+  --ok-bg: #163826;
+  --bad: #ff7070;
+  --bad-bg: #3f1820;
+  --water: #5ab4e8;
+  --mint: #5fd0c8;
+  --shadow: #07050c;
+  --f-display: "Press Start 2P", "Courier New", monospace;
+  --f-body: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
+  --notch: 4px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' shape-rendering='crispEdges'%3E%3Crect x='14' y='22' width='3' height='3' fill='%23574a80'/%3E%3Crect x='96' y='12' width='2' height='2' fill='%23ffd65a' opacity='.5'/%3E%3Crect x='150' y='64' width='3' height='3' fill='%23463a6b'/%3E%3Crect x='60' y='88' width='2' height='2' fill='%235fd0c8' opacity='.45'/%3E%3Crect x='124' y='140' width='3' height='3' fill='%23574a80'/%3E%3Crect x='30' y='150' width='2' height='2' fill='%23ffd65a' opacity='.35'/%3E%3C/svg%3E");
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 19px;
+  line-height: 1.5;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 30; background: var(--bg-2);
+}
+a { color: var(--sun); }
+p { margin: 0; max-width: 65ch; }
+ul, ol { margin: 0; }
+h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 400; }
+h1 {
+  font-family: var(--f-display); font-size: clamp(22px, 4.4vw, 42px); line-height: 1.4;
+  color: var(--sun); text-shadow: 4px 4px 0 var(--shadow);
+}
+h2 { font-family: var(--f-display); font-size: clamp(18px, 3vw, 26px); line-height: 1.45; color: var(--ink); text-shadow: 3px 3px 0 var(--shadow); }
+h3 { font-family: var(--f-display); font-size: 12px; line-height: 1.7; color: var(--sun); letter-spacing: .02em; }
+strong { font-weight: 700; }
+.eyebrow { font-family: var(--f-display); font-size: 10px; letter-spacing: .14em; color: var(--mint); text-transform: uppercase; }
+.muted { color: var(--muted); }
+.small { font-size: 17px; }
+
+.wrap {
+  max-width: 1120px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Cantos pixelados */
+.pix {
+  clip-path: polygon(0 var(--notch), var(--notch) var(--notch), var(--notch) 0, calc(100% - var(--notch)) 0,
+    calc(100% - var(--notch)) var(--notch), 100% var(--notch), 100% calc(100% - var(--notch)),
+    calc(100% - var(--notch)) calc(100% - var(--notch)), calc(100% - var(--notch)) 100%, var(--notch) 100%,
+    var(--notch) calc(100% - var(--notch)), 0 calc(100% - var(--notch)));
+}
+.panel {
+  background: var(--panel); border: 4px solid var(--line);
+  box-shadow: inset 4px 4px 0 rgba(255,255,255,.04), inset -4px -4px 0 rgba(0,0,0,.28);
+}
+svg { display: block; max-width: 100%; }
+
+/* Botões */
+.btn, .btn-ghost {
+  font-family: var(--f-display); font-size: 12px; line-height: 1.4; letter-spacing: .04em; text-transform: uppercase;
+  border: 0; cursor: pointer; padding: 16px 20px 18px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn { background: var(--sun); color: var(--on-sun); box-shadow: inset 0 -6px 0 var(--sun-deep), inset 0 4px 0 rgba(255,255,255,.35); }
+.btn-ghost { background: var(--panel-2); color: var(--ink); box-shadow: inset 0 -6px 0 var(--shadow), inset 0 4px 0 rgba(255,255,255,.06); }
+.btn:hover, .btn-ghost:hover { filter: brightness(1.1); }
+.btn:active, .btn-ghost:active { transform: translateY(3px); box-shadow: inset 0 -2px 0 var(--sun-deep); }
+.btn-ghost:active { box-shadow: inset 0 -2px 0 var(--shadow); }
+.btn-sm { font-size: 10px; padding: 12px 14px 14px; }
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px dashed var(--mint); outline-offset: -7px; }
+.btn:focus-visible { outline-color: var(--on-sun); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* HUD */
+header.hud { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg-2); border-bottom: 4px solid var(--line); }
+.hud .wrap { display: flex; align-items: center; gap: 16px; min-height: 62px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: 10px; color: var(--sun); text-decoration: none; white-space: nowrap; flex: none; }
+.brand svg { width: 22px; height: auto; }
+.hud nav { margin-left: auto; overflow-x: auto; min-width: 0; scrollbar-width: none; }
+.hud nav::-webkit-scrollbar { display: none; }
+.hud nav ul { display: flex; gap: 4px; list-style: none; padding: 0; }
+.hud nav a { display: block; font-family: var(--f-display); font-size: 10px; color: var(--muted); padding: 12px 10px; text-decoration: none; white-space: nowrap; }
+.hud nav a:hover, .hud nav a.on { color: var(--ink); background: var(--panel-2); }
+.hud nav a.on { box-shadow: inset 0 -4px 0 var(--sun); }
+@media (max-width: 640px) { .brand span { display: none; } }
+
+section { scroll-margin-top: 76px; padding-block: 72px 16px; }
+.sec-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+
+/* Início */
+.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding-block: 48px 24px; }
+.hero-copy { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.dialog { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; background: var(--shadow); border: 4px solid var(--ink); padding: 16px 18px 28px; }
+.portrait { width: 76px; height: 76px; display: grid; place-items: center; background: var(--panel-2); border: 4px solid var(--line); }
+.portrait svg { width: 40px; height: auto; }
+.dialog .who { font-family: var(--f-display); font-size: 10px; color: var(--sun); margin-bottom: 8px; }
+.dialog .more { position: absolute; right: 14px; bottom: 10px; animation: blink 1s steps(2, jump-none) infinite; }
+.quest { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.quest li { font-family: var(--f-display); font-size: 9px; letter-spacing: .06em; color: var(--muted); background: var(--panel); border: 2px solid var(--line); padding: 8px 10px; }
+.quest li b { color: var(--sun); font-weight: 400; margin-right: 6px; }
+.scene { position: relative; min-height: 360px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 24px 16px 0; overflow: hidden;
+  background: linear-gradient(var(--bg-2) 0 38%, var(--sky-2) 38% 68%, var(--panel) 68%); border: 4px solid var(--line); }
+.scene .star { position: absolute; width: 4px; height: 4px; background: var(--ink); opacity: .7; animation: twinkle 2.4s steps(2, jump-none) infinite; }
+.bulb { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); filter: drop-shadow(0 0 22px rgba(255, 214, 90, .55)); animation: glow 2.8s steps(3, jump-none) infinite alternate; }
+.bulb svg { width: 72px; height: auto; }
+.belt { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: center; gap: clamp(6px, 1.8vw, 16px); width: 100%; }
+.belt .item { animation: bob 1.4s steps(2, jump-none) infinite; }
+.belt .item:nth-child(2) { animation-delay: .35s; }
+.belt .item:nth-child(3) { animation-delay: .7s; }
+.belt .item:nth-child(4) { animation-delay: 1.05s; }
+.belt .item svg { height: clamp(28px, 6vw, 46px); width: auto; }
+.belt .arrow svg { height: clamp(18px, 3.4vw, 26px); width: auto; animation: nudge .8s steps(2, jump-none) infinite; }
+.belt .bin { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.belt .bin svg { height: clamp(78px, 16vw, 118px); width: auto; }
+.tag-chip { font-family: var(--f-display); font-size: 8px; letter-spacing: .08em; color: var(--on-sun); background: var(--sun); padding: 5px 6px 4px; }
+.floor { align-self: stretch; height: 28px; margin-inline: -16px; background: repeating-linear-gradient(90deg, var(--line) 0 16px, var(--panel-2) 16px 32px); border-top: 4px solid var(--line-hi); }
+@media (max-width: 880px) { .hero { grid-template-columns: 1fr; } .scene { min-height: 300px; } }
+@media (max-width: 480px) { .portrait { width: 56px; height: 56px; } .portrait svg { width: 28px; } }
+
+/* Aprender */
+.rule { display: grid; grid-template-columns: auto 1fr 1fr; gap: 20px; align-items: center; padding: 20px 22px; margin-bottom: 20px; border-color: var(--sun); }
+.rule .label { font-family: var(--f-display); font-size: 11px; color: var(--sun); line-height: 1.7; }
+.rule .pair { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.rule .pair svg { flex: none; width: 46px; height: auto; }
+@media (max-width: 820px) { .rule { grid-template-columns: 1fr; } }
+
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: dense; gap: 20px; }
+.span2 { grid-column: span 2; }
+@media (max-width: 980px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 660px) { .cards { grid-template-columns: minmax(0, 1fr); } .span2 { grid-column: auto; } }
+.card { display: flex; flex-direction: column; gap: 16px; padding: 22px; min-width: 0; }
+.card-head { display: flex; align-items: center; gap: 14px; }
+.tile { flex: none; width: 60px; height: 60px; display: grid; place-items: center; background: var(--panel-2); border: 3px solid var(--line); }
+.tile svg { width: 38px; height: auto; }
+.rows { display: grid; gap: 14px; }
+.row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; }
+.row .ic { display: grid; place-items: center; height: 40px; }
+.row .ic svg { max-width: 40px; max-height: 34px; width: auto; height: auto; }
+.row strong { display: block; color: var(--ink); }
+.row p { color: var(--muted); }
+.impacts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 520px) { .impacts { grid-template-columns: minmax(0, 1fr); } }
+.impact { background: var(--bg-2); border: 3px solid var(--line); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.impact .top { display: flex; align-items: center; gap: 10px; }
+.impact .top svg { height: 28px; width: auto; }
+.impact strong { font-family: var(--f-display); font-size: 10px; font-weight: 400; color: var(--ink); letter-spacing: .04em; }
+.impact p { color: var(--muted); font-size: 17px; }
+.dest { display: inline-block; margin-top: 6px; font-family: var(--f-display); font-size: 8px; letter-spacing: .06em; padding: 5px 7px 4px; color: var(--bg); }
+.dest.go { background: var(--ok); }
+.dest.rec { background: var(--water); }
+.bul { list-style: none; padding: 0; display: grid; gap: 10px; }
+.bul li { position: relative; padding-left: 22px; }
+.bul li::before { content: ""; position: absolute; left: 0; top: .55em; width: 8px; height: 8px; background: var(--sun); box-shadow: 2px 2px 0 var(--sun-deep); }
+.chain { list-style: none; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chain li { font-family: var(--f-display); font-size: 9px; letter-spacing: .04em; line-height: 1.5; padding: 9px 10px 8px; background: var(--panel-2); border: 2px solid var(--line-hi); color: var(--ink); }
+.chain li.end { background: var(--ok-bg); border-color: var(--ok); }
+.chain .to { background: none; border: 0; padding: 0; color: var(--sun); }
+.note { font-size: 17px; color: var(--muted); border-left: 4px solid var(--line-hi); padding-left: 12px; }
+.cta { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 18px 24px; align-items: center; justify-content: space-between; padding: 22px; }
+
+/* Quiz */
+.quiz { max-width: 920px; margin-inline: auto; padding: 0; }
+.qbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; padding: 14px 18px; background: var(--bg-2); border-bottom: 4px solid var(--line); }
+.qbar .voice { font-size: 16px; color: var(--muted); flex: 1 1 220px; min-width: 0; }
+.tog { font-family: var(--f-display); font-size: 9px; letter-spacing: .06em; padding: 9px 10px 8px; background: var(--panel-2); color: var(--muted); border: 2px solid var(--line); cursor: pointer; }
+.tog[aria-pressed="true"] { color: var(--on-sun); background: var(--sun); border-color: var(--sun-deep); }
+.qscreen { padding: 24px 22px 26px; display: flex; flex-direction: column; gap: 18px; }
+.rules { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap: 10px; }
+.rules li { background: var(--bg-2); border: 3px solid var(--line); padding: 12px 14px; }
+.rules b { display: block; font-family: var(--f-display); font-size: 16px; font-weight: 400; color: var(--sun); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+.rules span { color: var(--muted); font-size: 17px; }
+.qhud { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.chip { font-family: var(--f-display); font-size: 10px; letter-spacing: .05em; padding: 9px 10px 8px; background: var(--bg-2); border: 2px solid var(--line); color: var(--ink); font-variant-numeric: tabular-nums; }
+.chip b { color: var(--sun); font-weight: 400; }
+.qhud .right { margin-left: auto; }
+.timer { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.tbar { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; padding: 5px; background: var(--shadow); border: 3px solid var(--line); }
+.tbar i { height: 18px; background: var(--sun); }
+.tbar i.off { background: var(--panel-2); }
+.tbar.warn i:not(.off) { background: var(--amber); }
+.tbar.danger i:not(.off) { background: var(--bad); }
+.tbar.wait { opacity: .45; }
+.tnum { font-family: var(--f-display); font-size: 22px; min-width: 3ch; text-align: right; color: var(--sun); font-variant-numeric: tabular-nums; }
+.tnum.danger { color: var(--bad); }
+.tstatus { font-size: 17px; color: var(--muted); min-height: 1.5em; }
+.qtag { align-self: flex-start; font-family: var(--f-display); font-size: 9px; letter-spacing: .1em; color: var(--bg); background: var(--bad); padding: 6px 8px 5px; animation: blink 1.2s steps(2, jump-none) 3; }
+.qtext { font-family: var(--f-body); font-size: clamp(21px, 2.6vw, 26px); line-height: 1.4; font-weight: 600; color: var(--ink); max-width: none; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 680px) { .opts { grid-template-columns: minmax(0, 1fr); } }
+.opt { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: center; text-align: left; background: var(--panel-2); color: var(--ink); border: 4px solid var(--line); padding: 12px 14px; font-family: var(--f-body); font-size: 18px; line-height: 1.35; cursor: pointer; }
+.opt .key { width: 36px; height: 36px; display: grid; place-items: center; background: var(--shadow); color: var(--sun); font-family: var(--f-display); font-size: 12px; }
+.opt:hover:not(:disabled) { border-color: var(--sun); }
+.opt:disabled { cursor: default; }
+.opt.dim { opacity: .5; }
+.opt.correct { border-color: var(--ok); background: var(--ok-bg); opacity: 1; }
+.opt.correct .key { background: var(--ok); color: var(--bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); opacity: 1; }
+.opt.wrong .key { background: var(--bad); color: var(--bg); }
+.feedback { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-2); border: 4px solid var(--line); }
+.feedback.ok { border-color: var(--ok); }
+.feedback.bad { border-color: var(--bad); }
+.ftitle { font-family: var(--f-display); font-size: 14px; line-height: 1.6; }
+.feedback.ok .ftitle { color: var(--ok); }
+.feedback.bad .ftitle { color: var(--bad); }
+.qfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.hint { font-size: 15px; color: var(--muted); }
+@media (hover: none) { .hint { display: none; } }
+
+.result { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
+@media (max-width: 560px) { .result { grid-template-columns: minmax(0, 1fr); justify-items: start; } }
+.badge { width: 140px; height: 140px; display: grid; place-items: center; background: var(--bg-2); border: 4px solid var(--sun); }
+.badge svg { width: 84px; height: auto; animation: bob 1.4s steps(2, jump-none) infinite; }
+.rank { font-family: var(--f-display); font-size: clamp(14px, 2.4vw, 19px); line-height: 1.6; color: var(--sun); }
+.big { font-family: var(--f-display); font-size: clamp(16px, 2.6vw, 22px); line-height: 1.6; font-variant-numeric: tabular-nums; }
+.result .txt { display: flex; flex-direction: column; gap: 10px; }
+details.review { background: var(--bg-2); border: 3px solid var(--line); padding: 4px 16px; }
+details.review summary { cursor: pointer; font-family: var(--f-display); font-size: 10px; letter-spacing: .05em; padding: 12px 0; color: var(--ink); }
+details.review ol { padding-left: 22px; display: grid; gap: 12px; padding-bottom: 14px; }
+details.review .st { font-family: var(--f-display); font-size: 8px; padding: 3px 5px 2px; margin-right: 6px; color: var(--bg); vertical-align: 2px; }
+details.review .st.ok { background: var(--ok); }
+details.review .st.bad { background: var(--bad); }
+
+/* Coleta */
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.steps { list-style: none; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start; }
+.steps li::before { content: counter(s); width: 38px; height: 38px; display: grid; place-items: center; font-family: var(--f-display); font-size: 12px; background: var(--sun); color: var(--on-sun); box-shadow: inset 0 -4px 0 var(--sun-deep); }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label { font-family: var(--f-display); font-size: 10px; letter-spacing: .05em; color: var(--ink); }
+.field input { font-family: var(--f-body); font-size: 19px; color: var(--ink); background: var(--shadow); border: 3px solid var(--line-hi); padding: 12px 14px; width: 100%; }
+.field input::placeholder { color: var(--muted); }
+.links { display: flex; flex-wrap: wrap; gap: 10px; }
+.refs { list-style: none; padding: 0; display: grid; gap: 14px; }
+.refs li { padding-left: 14px; border-left: 4px solid var(--line-hi); }
+footer { padding-block: 48px 40px; margin-top: 56px; border-top: 4px solid var(--line); background: var(--bg-2); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+footer p { font-size: 16px; color: var(--muted); }
+
+@keyframes bob { 50% { transform: translateY(-6px); } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes twinkle { 50% { opacity: .15; } }
+@keyframes glow { to { filter: drop-shadow(0 0 34px rgba(255, 214, 90, .8)); } }
+@keyframes nudge { 50% { transform: translateX(4px); } }
+@keyframes drop { 50% { transform: translateY(1px); } }
+
+/* Cena: remédio no lixo */
+.trash { margin: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; }
+.trash-stage { position: relative; flex: 1 1 auto; min-height: 280px; background: var(--sky-2); border: 3px solid var(--line); overflow: hidden; }
+.trash-stage svg { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); max-width: none; }
+.trash-stage .fall { animation: drop 1.2s steps(2, jump-none) infinite; }
+.trash-stage .nosign { animation: blink 1.6s steps(2, jump-none) infinite; }
+.trash figcaption { font-size: 17px; color: var(--muted); max-width: 65ch; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; }
+}
+</style>
+
+<header class="hud">
+  <div class="wrap">
+    <a class="brand" href="#inicio" data-go="inicio"><i data-sprite="bulb" aria-hidden="true"></i><span>DESCARTE CONSCIENTE</span></a>
+    <nav aria-label="Seções">
+      <ul>
+        <li><a href="#inicio" data-go="inicio">Início</a></li>
+        <li><a href="#aprender" data-go="aprender">Aprender</a></li>
+        <li><a href="#quiz" data-go="quiz">Quiz</a></li>
+        <li><a href="#coleta" data-go="coleta">Coleta</a></li>
+        <li><a href="#fontes" data-go="fontes">Fontes</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- INÍCIO -->
+  <section id="inicio" class="wrap" style="padding-block: 0;">
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TCC · Curso Técnico em Farmácia</p>
+        <h1>Missão: Descarte Consciente</h1>
+        <div class="dialog pix">
+          <div class="portrait pix"><i data-sprite="bulb" aria-hidden="true"></i></div>
+          <div>
+            <p class="who">GUIA DA MISSÃO</p>
+            <p>Remédio vencido ou que sobrou de um tratamento não vai para o lixo, a pia ou o vaso sanitário. Nesta missão você descobre por que isso faz mal ao ambiente e à saúde, testa o que aprendeu em um quiz e encontra onde entregar seus medicamentos.</p>
+          </div>
+          <span class="more" aria-hidden="true"><i data-sprite="down" data-scale="3"></i></span>
+        </div>
+        <ol class="quest" aria-label="Etapas da missão">
+          <li><b>1</b>Aprender</li>
+          <li><b>2</b>Quiz</li>
+          <li><b>3</b>Pontos de coleta</li>
+        </ol>
+        <div class="actions">
+          <button class="btn pix" type="button" data-go="aprender">Começar missão</button>
+          <button class="btn-ghost pix" type="button" data-go="quiz">Ir para o quiz</button>
+        </div>
+      </div>
+      <div class="scene pix" aria-label="Ilustração: cápsula, cartela, frasco e caixa de remédio indo para um coletor de medicamentos" role="img">
+        <span class="star" style="left:8%;top:14%"></span>
+        <span class="star" style="left:22%;top:30%;animation-delay:.6s"></span>
+        <span class="star" style="left:78%;top:12%;animation-delay:1.2s"></span>
+        <span class="star" style="left:90%;top:34%;animation-delay:.3s"></span>
+        <span class="star" style="left:64%;top:24%;animation-delay:1.8s"></span>
+        <span class="star" style="left:36%;top:8%;animation-delay:.9s"></span>
+        <div class="bulb"><i data-sprite="bulb"></i></div>
+        <div class="belt">
+          <div class="item"><i data-sprite="capsule"></i></div>
+          <div class="item"><i data-sprite="blister"></i></div>
+          <div class="item"><i data-sprite="bottle"></i></div>
+          <div class="item"><i data-sprite="box"></i></div>
+          <div class="arrow"><i data-sprite="arrow"></i></div>
+          <div class="bin"><span class="tag-chip">COLETOR</span><i data-sprite="bin"></i></div>
+        </div>
+        <div class="floor"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APRENDER -->
+  <section id="aprender" class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Fase 1 · Aprender</p>
+      <h2>O que todo mundo deveria saber</h2>
+      <p class="muted">Seis pontos essenciais sobre o descarte de medicamentos, em linguagem direta.</p>
+    </div>
+
+    <div class="rule panel pix">
+      <p class="label">REGRA<br>DE OURO</p>
+      <div class="pair"><i data-sprite="blister"></i><p><strong>Medicamento</strong> vai para um <strong>ponto de coleta</strong> apropriado, conforme as orientações do seu município.</p></div>
+      <div class="pair"><i data-sprite="box"></i><p><strong>Embalagem</strong> recebe o destino adequado ao seu <strong>material</strong> e às <strong>regras locais</strong>.</p></div>
+    </div>
+
+    <div class="cards">
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="trashx"></i></div><h3>Por que não no lixo, na pia ou no vaso?</h3></div>
+        <p>Medicamentos são feitos para agir no organismo em pequenas quantidades. Fora do lugar certo, continuam ativos.</p>
+        <div class="rows">
+          <div class="row"><div class="ic"><i data-sprite="trashx"></i></div><div><strong>Lixo comum</strong><p>Vai para aterros ou lixões. Os resíduos podem atingir o solo e a água subterrânea pelo chorume, e o remédio pode ser encontrado por crianças, animais ou catadores.</p></div></div>
+          <div class="row"><div class="ic"><i data-sprite="drop"></i></div><div><strong>Pia e ralo</strong><p>Seguem pelo esgoto. As estações de tratamento não foram projetadas para remover completamente os fármacos, e nem todo esgoto é tratado.</p></div></div>
+          <div class="row"><div class="ic"><i data-sprite="fish"></i></div><div><strong>Vaso sanitário</strong><p>Mesmo caminho do ralo: o resíduo chega a rios e ao mar. Dar descarga não faz o medicamento desaparecer.</p></div></div>
+        </div>
+      </article>
+
+      <article class="card panel pix span2">
+        <div class="card-head"><div class="tile"><i data-sprite="drop"></i></div><h3>Impactos na água, no solo, nos animais e na saúde</h3></div>
+        <div class="impacts">
+          <div class="impact"><div class="top"><i data-sprite="drop"></i><strong>ÁGUA</strong></div><p>Estudos no Brasil e no mundo já detectaram resíduos de fármacos em rios, represas e outros corpos d'água, em concentrações baixas, mas contínuas.</p></div>
+          <div class="impact"><div class="top"><i data-sprite="sprout"></i><strong>SOLO</strong></div><p>Em aterros e lixões, o chorume carrega substâncias que podem contaminar o solo e chegar às águas subterrâneas.</p></div>
+          <div class="impact"><div class="top"><i data-sprite="fish"></i><strong>ANIMAIS</strong></div><p>Hormônios, como os de anticoncepcionais, podem alterar a reprodução de peixes. Outros fármacos afetam organismos aquáticos mesmo em doses pequenas.</p></div>
+          <div class="impact"><div class="top"><i data-sprite="cross"></i><strong>SAÚDE HUMANA</strong></div><p>Antibióticos no ambiente favorecem bactérias resistentes. Remédios guardados ou jogados sem cuidado causam intoxicações acidentais, especialmente em crianças e animais domésticos.</p></div>
+        </div>
+        <figure class="trash">
+          <div class="trash-stage" id="trashStage" role="img" aria-label="Ilustração: remédios sendo jogados no lixo comum, com um sinal de proibido. Embaixo da lixeira, o chorume escorre pelo solo até a água subterrânea, onde vive um peixe."></div>
+          <figcaption>Remédio no lixo comum: no aterro, o chorume carrega os resíduos pelo solo até a água subterrânea.</figcaption>
+        </figure>
+      </article>
+
+      <article class="card panel pix span2">
+        <div class="card-head"><div class="tile"><i data-sprite="capsule"></i></div><h3>Como descartar cada tipo de medicamento</h3></div>
+        <div class="rows">
+          <div class="row"><div class="ic"><i data-sprite="blister"></i></div><div><strong>Comprimidos e cápsulas</strong><p>Deixe na cartela (blíster) ou no frasco original. Não é preciso tirar os comprimidos da embalagem. Leve ao ponto de coleta.</p></div></div>
+          <div class="row"><div class="ic"><i data-sprite="bottle"></i></div><div><strong>Xaropes, gotas e suspensões</strong><p>Mantenha o líquido dentro do frasco, bem tampado. Nunca despeje na pia ou no ralo.</p></div></div>
+          <div class="row"><div class="ic"><i data-sprite="tube"></i></div><div><strong>Pomadas, cremes e géis</strong><p>Entregue a bisnaga fechada, com o que sobrou dentro.</p></div></div>
+          <div class="row"><div class="ic"><i data-sprite="spray"></i></div><div><strong>Sprays e inaladores (bombinhas)</strong><p>Leve ao ponto de coleta sem furar, amassar ou queimar a embalagem.</p></div></div>
+          <div class="row"><div class="ic"><i data-sprite="syringe"></i></div><div><strong>Agulhas e seringas</strong><p>São perfurocortantes e, em geral, não vão no coletor de medicamentos da farmácia. Guarde em recipiente rígido e bem fechado e pergunte na UBS ou no serviço de saúde do seu município onde entregar.</p></div></div>
+        </div>
+      </article>
+
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="box"></i></div><h3>Medicamento ou embalagem?</h3></div>
+        <div class="rows">
+          <div class="row"><div class="ic"><i data-sprite="blister"></i></div><div><strong>Embalagem primária</strong><p>Fica em contato direto com o medicamento: cartela, frasco, bisnaga, ampola. Vai junto com o medicamento.</p><span class="dest go">→ PONTO DE COLETA</span></div></div>
+          <div class="row"><div class="ic"><i data-sprite="box"></i></div><div><strong>Embalagem secundária</strong><p>Caixa de papel e bula. Sem contato com o medicamento, em geral podem seguir para a coleta seletiva, conforme as regras do município.</p><span class="dest rec">→ COLETA SELETIVA*</span></div></div>
+        </div>
+        <p class="note">*Alguns pontos de coleta também recebem caixas e bulas. Na dúvida, siga a orientação do local.</p>
+      </article>
+
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="bottle"></i></div><h3>Vencidos e sobras de tratamento</h3></div>
+        <ul class="bul">
+          <li>Não use medicamento vencido, nem com cor, cheiro ou aspecto alterados.</li>
+          <li>Sobras não devem virar estoque para automedicação, nem ser repassadas a outras pessoas sem orientação de um profissional de saúde.</li>
+          <li>Alguns produtos duram menos depois de abertos ou preparados, como colírios e suspensões de antibiótico. Confira a bula.</li>
+          <li>Revise a farmacinha de casa de tempos em tempos e leve ao ponto de coleta o que não será mais usado.</li>
+        </ul>
+      </article>
+
+      <article class="card panel pix span2">
+        <div class="card-head"><div class="tile"><i data-sprite="cross"></i></div><h3>Pontos de coleta e logística reversa</h3></div>
+        <p>A <strong>Política Nacional de Resíduos Sólidos</strong> (Lei nº 12.305/2010) prevê a <strong>logística reversa</strong>: o produto descartado volta pela cadeia que o colocou no mercado para receber uma destinação ambientalmente adequada. A responsabilidade é compartilhada entre fabricantes, importadores, distribuidores, comerciantes, consumidores e poder público.</p>
+        <p>Para medicamentos domiciliares de uso humano, vencidos ou em desuso, o sistema foi regulamentado pelo <strong>Decreto nº 10.388/2020</strong>. Farmácias e drogarias atuam como pontos de recebimento, com implantação gradual pelos municípios. Por isso, nem todo estabelecimento tem coletor: vale confirmar antes.</p>
+        <ol class="chain" aria-label="Caminho do medicamento na logística reversa">
+          <li>VOCÊ</li><li class="to" aria-hidden="true">▸</li>
+          <li>FARMÁCIA</li><li class="to" aria-hidden="true">▸</li>
+          <li>DISTRIBUIDOR</li><li class="to" aria-hidden="true">▸</li>
+          <li>FABRICANTE / IMPORTADOR</li><li class="to" aria-hidden="true">▸</li>
+          <li class="end">DESTINAÇÃO ADEQUADA</li>
+        </ol>
+      </article>
+    </div>
+
+    <div class="cta panel pix">
+      <div>
+        <p class="eyebrow">Fase 1 concluída</p>
+        <p style="margin-top:8px">Hora de testar o que você aprendeu. Atenção às pegadinhas.</p>
+      </div>
+      <button class="btn pix" type="button" data-go="quiz">Ir para o quiz</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Fase 2 · Desafio</p>
+      <h2>Quiz do Descarte</h2>
+    </div>
+
+    <div class="quiz panel pix">
+      <div class="qbar">
+        <button class="tog" type="button" id="voiceTog" aria-pressed="true">VOZ: LIGADA</button>
+        <button class="tog" type="button" id="sfxTog" aria-pressed="true">SONS: LIGADOS</button>
+        <p class="voice" id="voiceInfo">Procurando voz em português do Brasil…</p>
+      </div>
+
+      <!-- Tela inicial -->
+      <div class="qscreen" id="qStart">
+        <p>Responda a 10 perguntas sobre descarte de medicamentos. Cada pergunta e suas alternativas são lidas em voz alta, e o cronômetro começa assim que a leitura termina.</p>
+        <ul class="rules">
+          <li><b>10</b><span>perguntas de múltipla escolha, algumas com pegadinha</span></li>
+          <li><b>20 s</b><span>para responder cada pergunta</span></li>
+          <li><b>100 pts</b><span>por acerto, mais 5 pontos por segundo que sobrar</span></li>
+        </ul>
+        <div class="actions"><button class="btn pix" type="button" id="startBtn">Iniciar quiz</button></div>
+      </div>
+
+      <!-- Pergunta -->
+      <div class="qscreen" id="qPlay" hidden>
+        <div class="qhud">
+          <span class="chip" id="qCount">PERGUNTA <b>1</b>/10</span>
+          <span class="chip" id="qScore">PONTOS <b>0</b></span>
+          <button class="btn-ghost btn-sm pix right" type="button" id="restartBtn">Reiniciar</button>
+        </div>
+        <div class="timer" role="timer" aria-label="Tempo restante">
+          <div class="tbar wait" id="tbar"></div>
+          <div class="tnum" id="tnum">20</div>
+        </div>
+        <p class="tstatus" id="tstatus" aria-live="polite"></p>
+        <span class="qtag" id="qTag" hidden>PEGADINHA</span>
+        <p class="qtext" id="qText"></p>
+        <div class="opts" id="opts"></div>
+        <div class="feedback" id="feedback" hidden>
+          <p class="ftitle" id="fTitle" aria-live="assertive"></p>
+          <p id="fText"></p>
+          <div class="actions"><button class="btn pix" type="button" id="nextBtn">Próxima pergunta</button></div>
+        </div>
+        <div class="qfoot">
+          <button class="btn-ghost btn-sm pix" type="button" id="replayBtn">Ouvir de novo</button>
+          <span class="hint">Atalhos: teclas 1 a 4 para responder, Enter para avançar.</span>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div class="qscreen" id="qEnd" hidden>
+        <div class="result">
+          <div class="badge pix" id="badge"></div>
+          <div class="txt">
+            <p class="eyebrow">Missão cumprida · Conquista desbloqueada</p>
+            <p class="rank" id="rank"></p>
+            <p class="big" id="final"></p>
+            <p id="msg"></p>
+            <p class="note">Conquista simbólica, apenas para celebrar o aprendizado. Este site não oferece prêmios.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn pix" type="button" id="againBtn">Jogar de novo</button>
+          <button class="btn-ghost pix" type="button" data-go="coleta">Ver pontos de coleta</button>
+        </div>
+        <details class="review" id="review"><summary>REVISAR RESPOSTAS</summary><ol id="reviewList"></ol></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLETA -->
+  <section id="coleta" class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Fase 3 · Pontos de coleta</p>
+      <h2>Onde entregar seus medicamentos</h2>
+      <p class="muted">Os pontos variam de cidade para cidade. Estes passos ajudam a encontrar um local que receba medicamentos vencidos ou sem uso.</p>
+    </div>
+    <div class="grid2">
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="pin"></i></div><h3>Passo a passo</h3></div>
+        <ol class="steps">
+          <li><p><strong>Separe</strong> os medicamentos vencidos ou sem uso, nas embalagens originais e bem fechados.</p></li>
+          <li><p><strong>Procure farmácias e drogarias com coletor.</strong> Em alguns municípios, Unidades Básicas de Saúde (UBS) também recebem.</p></li>
+          <li><p><strong>Confirme antes de ir.</strong> Ligue para o estabelecimento ou consulte o site da prefeitura (secretarias de Saúde ou de Meio Ambiente).</p></li>
+          <li><p><strong>Entregue</strong> no coletor ou ao atendente, seguindo a orientação do local.</p></li>
+        </ol>
+      </article>
+
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="bin"></i></div><h3>Buscar no mapa</h3></div>
+        <div class="field">
+          <label for="city">SUA CIDADE OU BAIRRO</label>
+          <input id="city" type="text" autocomplete="address-level2" placeholder="Ex.: Campinas, SP">
+        </div>
+        <div class="links">
+          <a class="btn pix" id="cityLink" href="https://www.google.com/maps/search/?api=1&amp;query=descarte%20de%20medicamentos" target="_blank" rel="noopener noreferrer">Buscar na cidade</a>
+          <a class="btn-ghost pix" href="https://www.google.com/maps/search/?api=1&amp;query=descarte%20de%20medicamentos%20perto%20de%20mim" target="_blank" rel="noopener noreferrer">Perto de mim</a>
+        </div>
+        <p class="note">A busca abre o Google Maps em outra aba. Lá, o Maps pode pedir permissão para usar sua localização; este site não acessa nem guarda sua localização. Os resultados não são verificados por este projeto, então confirme com o estabelecimento.</p>
+      </article>
+
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="cross"></i></div><h3>O que perguntar ao ligar</h3></div>
+        <ul class="bul">
+          <li>Vocês recebem medicamentos vencidos ou sem uso?</li>
+          <li>Recebem líquidos, pomadas e sprays?</li>
+          <li>Recebem caixas e bulas, ou devo separá-las para a coleta seletiva?</li>
+          <li>Em que horário posso fazer a entrega?</li>
+        </ul>
+      </article>
+
+      <article class="card panel pix">
+        <div class="card-head"><div class="tile"><i data-sprite="syringe"></i></div><h3>Casos que pedem outro caminho</h3></div>
+        <ul class="bul">
+          <li><strong>Agulhas, seringas e lancetas:</strong> recipiente rígido e fechado, entregue no local indicado pela UBS ou pela prefeitura.</li>
+          <li><strong>Medicamentos veterinários:</strong> não fazem parte do Decreto nº 10.388/2020. Pergunte ao médico-veterinário ou à prefeitura.</li>
+          <li><strong>Dúvidas sobre um produto:</strong> converse com o farmacêutico, que pode orientar sobre uso e descarte.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- FONTES -->
+  <section id="fontes" class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Referências</p>
+      <h2>Fontes</h2>
+    </div>
+    <div class="card panel pix">
+      <ul class="refs">
+        <li>BRASIL. <strong>Lei nº 12.305, de 2 de agosto de 2010.</strong> Institui a Política Nacional de Resíduos Sólidos. <a href="https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12305.htm" target="_blank" rel="noopener noreferrer">planalto.gov.br</a></li>
+        <li>BRASIL. <strong>Decreto nº 10.388, de 5 de junho de 2020.</strong> Institui o sistema de logística reversa de medicamentos domiciliares vencidos ou em desuso, de uso humano, industrializados e manipulados, e de suas embalagens após o descarte pelos consumidores. <a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2020/decreto/D10388.htm" target="_blank" rel="noopener noreferrer">planalto.gov.br</a></li>
+        <li>AGÊNCIA NACIONAL DE VIGILÂNCIA SANITÁRIA (Anvisa). <a href="https://www.gov.br/anvisa/pt-br" target="_blank" rel="noopener noreferrer">gov.br/anvisa</a></li>
+        <li>ORGANIZAÇÃO MUNDIAL DA SAÚDE. <strong>Antimicrobial resistance</strong> (nota descritiva). <a href="https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance" target="_blank" rel="noopener noreferrer">who.int</a></li>
+      </ul>
+      <p class="note">As regras de coleta podem variar entre municípios. Em caso de dúvida, consulte um farmacêutico ou a prefeitura da sua cidade.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Trabalho de Conclusão de Curso · Técnico em Farmácia</p>
+    <p>Missão: Descarte Consciente</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  /* ---------- Sprites em pixel art ---------- */
+  const PAL = { k:"#0b0812", w:"#f3ead7", W:"#ffffff", y:"#ffd65a", o:"#e8902f", r:"#e5484d", R:"#ff9a9e",
+    b:"#4aa8e0", B:"#a8dcff", c:"#5fd0c8", g:"#49b86a", G:"#2f7d48", s:"#b7b3c9", S:"#7d7891", p:"#9b6ff0", n:"#7a4b2a", N:"#5a3519" };
+  const SPR = {
+    capsule: ["..kkkkkkkkkk..",".kRrrrrkwwwwk.","kRrrrrrkwwwwwk","krrrrrrkwwwwwk","krrrrrrkwwwwwk","krrrrrrkwwwwsk",".krrrrrkwwssk.","..kkkkkkkkkk.."],
+    blister: ["kkkkkkkkkkkk","kssssssssssk","ksoosoosoosk","ksoosoosoosk","kssssssssssk","ksoosoosoosk","ksoosoosoosk","kssssssssssk","kkkkkkkkkkkk"],
+    bottle: ["..kkkkkk..","..kppppk..","..kkkkkk..","...kook...","..kooook..",".kooooook.",".kowwwwok.",".kowrrwok.",".kowwwwok.",".kooooook.",".kooooook.","..kkkkkk.."],
+    box: ["kkkkkkkkkkkkk","kwwwwwwwwwwwk","kbbbbbbbbbbbk","kwwwwwwwwwwwk","kwwwwwgwwwwwk","kwwwwgggwwwwk","kwwwwwgwwwwwk","kwwwwwwwwwwwk","kwsssssssswwk","kwwwwwwwwwwwk","kkkkkkkkkkkkk"],
+    cross: ["...kkkk...","...kggk...","...kggk...","kkkkggkkkk","kggggggggk","kggggggggk","kkkkggkkkk","...kggk...","...kggk...","...kkkk..."],
+    drop: ["....kk....","...kbbk...","...kbbk...","..kbbbbk..","..kbBbbk..",".kbBbbbbk.",".kbBbbbbk.","kbbbbbbbbk","kbbbbbbbbk",".kbbbbbbk.","..kbbbbk..","...kkkk..."],
+    fish: ["..kkkkkk......",".kccccccck..kk","kcckcccccckkck","kcccccccccccck","kccccccccckkck",".kccccccck..kk","..kkkkkk......"],
+    sprout: ["kkk....kkk","kggk..kggk",".kggkkggk.","..kkggkk..","....GG....","....GG....",".nnnnnnnn.","nnnnnnnnnn","nNnnnNnnNn"],
+    trashx: ["....kkkk....","kkkkkkkkkkkk","kssssssssssk","kkkkkkkkkkkk",".kssssssssk.",".ksrrssrrsk.",".kssrrrrssk.",".ksssrrsssk.",".kssrrrrssk.",".ksrrssrrsk.",".kssssssssk.","..kkkkkkkk.."],
+    bin: ["kkkkkkkkkkkkkk","kGGGGGGGGGGGGk","kGkkkkkkkkkkGk","kGGGGGGGGGGGGk","kkkkkkkkkkkkkk","kggggggggggggk","kgggggwwgggggk","kgggggwwgggggk","kgggwwwwwwgggk","kgggwwwwwwgggk","kgggggwwgggggk","kgggggwwgggggk","kggggggggggggk","kggggggggggggk","kkkkkkkkkkkkkk",".kk........kk."],
+    bulb: ["....kkkk....","..kkyyyykk..",".kyyWWyyyyk.",".kyWWyyyyyk.","kyyWyyyyyyyk","kyyyyyyyyyyk","kyyyyyyyyyyk",".kyyyyyyyyk.",".kyyyyyyyyk.","..kyyyyyyk..","...kyyyyk...","...kssssk...","...kkkkkk...","...kssssk...","....kkkk...."],
+    arrow: ["...kk...","...kyk..","kkkkyyk.","kyyyyyyk","kkkkyyk.","...kyk..","...kk..."],
+    down: ["yyyyyyy",".yyyyy.","..yyy..","...y..."],
+    tube: ["...kkkkkkkk.","kkkwwwwwwwwk","kppkbbbbbbwk","kppkwwwwwwwk","kkkwwwwwwwwk","...kkkkkkkk."],
+    spray: ["..kkkk..","..kSSk..",".kkkkkk.",".kbbbbk.",".kbBbbk.",".kbBbbk.",".kbbbbk.",".kbbbbk.",".kkkkkk."],
+    syringe: [".k.kkkkkkkk...","kkkkwwwwwwwk..",".kkkwrwrwrwkSS","kkkkwwwwwwwk..",".k.kkkkkkkk..."],
+    pin: ["...kkkk...","..krrrrk..",".krrwwrrk.","krrwwwwrrk","krrwwwwrrk",".krrwwrrk.",".krrrrrrk.","..krrrrk..","...krrk...","....kk...."],
+    trophy: ["..kkkkkkkk..","kkkyyyyyykkk","kykyWyyyykyk","kykyWyyyykyk",".kkyyyyyykk.","...kyyyyk...","....kyyk....",".....kk.....","....kyyk....","...kkkkkk...","..kyyyyyyk..","..kkkkkkkk.."]
+  };
+  function rectsFor(rows, dx = 0, dy = 0, tint) {
+    let rects = "";
+    rows.forEach((row, y) => {
+      let x = 0;
+      while (x < row.length) {
+        const ch = row[x];
+        if (ch === ".") { x++; continue; }
+        let run = 1;
+        while (row[x + run] === ch) run++;
+        const fill = (tint && tint[ch]) || PAL[ch];
+        rects += `<rect x="${x + dx}" y="${y + dy}" width="${run}" height="1" fill="${fill}"/>`;
+        x += run;
+      }
+    });
+    return rects;
+  }
+  function spriteSVG(name, scale, tint) {
+    const rows = SPR[name]; if (!rows) return "";
+    const h = rows.length, w = Math.max(...rows.map(r => r.length));
+    const rects = rectsFor(rows, 0, 0, tint);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w * scale}" height="${h * scale}" shape-rendering="crispEdges" aria-hidden="true" focusable="false">${rects}</svg>`;
+  }
+  document.querySelectorAll("[data-sprite]").forEach(el => {
+    el.outerHTML = spriteSVG(el.dataset.sprite, +el.dataset.scale || 4);
+  });
+
+  /* ---------- Cena: remédio jogado no lixo comum ---------- */
+  SPR.bigbin = ["k".repeat(18), "k" + "S".repeat(16) + "k", "k".repeat(18), ...Array(16).fill(".kssSsssSsssSsssk."), "..kkkkkkkkkkkkkk.."];
+  SPR.lid = ["........kkkk........", "........kssk........", "k".repeat(20), "k" + "s".repeat(18) + "k", "k".repeat(20)];
+  SPR.nosign = (() => {
+    const n = 19, c = 9, ro = 8, ri = 5.8, rows = [];
+    for (let y = 0; y < n; y++) {
+      let row = "";
+      for (let x = 0; x < n; x++) {
+        const d = Math.hypot(x - c, y - c);
+        row += (d <= ro && d >= ri) || (d < ri && Math.abs(x - y) <= 1) ? "r" : d <= ro + 1 && d > ro ? "k" : ".";
+      }
+      rows.push(row);
+    }
+    return rows;
+  })();
+  const stage = document.getElementById("trashStage");
+  function drawTrashScene() {
+    const box = stage.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    const u = box.width < 520 ? 3 : 4;
+    const W = Math.floor(box.width / u), H = Math.floor(box.height / u);
+    const waterH = 10, soilH = 12, groundY = H - waterH - soilH;
+    const cx = Math.floor(W / 2) - 2, bx = cx - 9, by = groundY - 20;
+    let seed = 11;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    let s = "";
+    const R = (x, y, w, h, f) => { s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${f}"/>`; };
+    // céu com estrelas
+    R(0, 0, W, groundY, "#1b1530");
+    for (let i = 0; i < Math.floor(W * groundY / 140); i++) R(Math.floor(rnd() * W), Math.floor(rnd() * (groundY - 3)), 1, 1, rnd() > .8 ? "#ffd65a" : "#574a80");
+    // grama e solo
+    R(0, groundY, W, 1, "#49b86a"); R(0, groundY + 1, W, 1, "#2f7d48");
+    R(0, groundY + 2, W, soilH - 2, "#5a3519");
+    for (let i = 0; i < W / 2; i++) R(Math.floor(rnd() * W), groundY + 2 + Math.floor(rnd() * (soilH - 2)), 1, 1, "#7a4b2a");
+    // água subterrânea
+    R(0, H - waterH, W, waterH, "#1f4f78");
+    for (let x = 1; x < W; x += 7) R(x, H - waterH + 1, 3, 1, "#4aa8e0");
+    // chorume escorrendo da lixeira pelo solo até a água
+    for (let y = groundY + 1; y < H; y++) {
+      const spread = Math.min(3 + Math.floor((y - groundY) * .6), 14), inWater = y >= H - waterH;
+      for (let x = cx - spread; x <= cx + spread; x++) if (rnd() < (inWater ? .3 : .55)) R(x, y, 1, 1, inWater ? "#5fae6a" : "#8fd14f");
+    }
+    s += rectsFor(SPR.fish, cx + 20, H - 8);
+    s += rectsFor(SPR.lid, bx - 24, groundY - 5);
+    s += rectsFor(SPR.bigbin, bx, by);
+    // remédios caindo dentro da lixeira
+    s += `<g class="fall">${rectsFor(SPR.capsule, cx - 18, by - 14)}${rectsFor(SPR.bottle, cx - 3, by - 13)}${rectsFor(SPR.blister, cx + 4, by - 19)}</g>`;
+    s += `<g class="nosign">${rectsFor(SPR.nosign, cx + 15, by - 4)}</g>`;
+    const txt = (x, y, t) => { s += `<text x="${x}" y="${y}" font-family="'Press Start 2P', monospace" font-size="3" fill="#f1e7d0" stroke="#0b0812" stroke-width=".7" paint-order="stroke">${t}</text>`; };
+    txt(cx + 16, groundY + 8, "CHORUME");
+    txt(3, H - 3, "ÁGUA SUBTERRÂNEA");
+    stage.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W * u}" height="${H * u}" shape-rendering="crispEdges" aria-hidden="true" focusable="false">${s}</svg>`;
+  }
+  if ("ResizeObserver" in window) new ResizeObserver(drawTrashScene).observe(stage);
+  drawTrashScene();
+  document.fonts?.ready.then(drawTrashScene);
+
+  /* ---------- Navegação ---------- */
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function go(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  }
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-go]");
+    if (!t) return;
+    e.preventDefault();
+    go(t.dataset.go);
+  });
+  const navLinks = [...document.querySelectorAll(".hud nav a")];
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle("on", a.dataset.go === en.target.id));
+      });
+    }, { rootMargin: "-35% 0px -60% 0px" });
+    document.querySelectorAll("main section").forEach(s => io.observe(s));
+  }
+  const startHash = location.hash.slice(1);
+  if (startHash && document.getElementById(startHash)) setTimeout(() => go(startHash), 60);
+
+  /* ---------- Busca de pontos de coleta ---------- */
+  const city = document.getElementById("city"), cityLink = document.getElementById("cityLink");
+  function updateCity() {
+    const q = ("descarte de medicamentos " + city.value.trim()).trim();
+    cityLink.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+  }
+  city.addEventListener("input", updateCity);
+  city.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); updateCity(); cityLink.click(); } });
+
+  /* ---------- Perguntas ---------- */
+  const QUESTIONS = [
+    { q: "Você encontrou uma cartela de comprimidos vencidos em casa. Qual é o destino correto?",
+      a: "Levar a um ponto de coleta de medicamentos, como uma farmácia que tenha coletor",
+      w: ["Colocar no lixo comum, bem embrulhada em uma sacola", "Jogar no vaso sanitário e dar descarga", "Enterrar no quintal, longe de hortas e plantas"],
+      e: "Medicamentos vencidos devem ir para um ponto de coleta. No lixo, no vaso ou enterrados, eles podem contaminar o solo e a água e causar intoxicações acidentais." },
+    { q: "Sobrou xarope no frasco depois do tratamento. O que fazer?",
+      a: "Levar o frasco bem fechado, com o líquido dentro, ao ponto de coleta",
+      w: ["Despejar na pia, lavar o frasco e colocar na reciclagem", "Esvaziar no ralo com bastante água corrente", "Guardar para usar na próxima vez que alguém tiver tosse"],
+      e: "Medicamentos líquidos não devem ser despejados em pias ou ralos. Feche bem o frasco e entregue no ponto de coleta. Usar sobras sem orientação é automedicação." },
+    { tag: "PEGADINHA", q: "Diluir o medicamento em bastante água antes de jogar na pia torna o descarte seguro?",
+      a: "Não. A substância continua presente e segue pelo esgoto até rios e outros corpos d'água",
+      w: ["Sim. Bem diluído, o medicamento perde totalmente o efeito", "Sim, desde que a água usada para diluir esteja quente", "Sim, porque a estação de tratamento remove todo o medicamento depois"],
+      e: "Diluir não elimina o fármaco, só o espalha. As estações de tratamento de esgoto não foram projetadas para remover completamente esses resíduos, e nem todo esgoto é tratado." },
+    { q: "Por que o descarte incorreto de antibióticos preocupa a saúde pública?",
+      a: "Porque pode favorecer o surgimento de bactérias resistentes aos antibióticos",
+      w: ["Porque os antibióticos se transformam em vírus no ambiente", "Porque os antibióticos deixam a água com cheiro muito forte", "Porque os antibióticos fazem as plantas crescerem sem controle"],
+      e: "Resíduos de antibióticos no ambiente expõem bactérias a essas substâncias, o que contribui para a resistência antimicrobiana. A OMS considera a resistência uma das maiores ameaças à saúde pública mundial." },
+    { q: "Resíduos de hormônios, como os de anticoncepcionais, que chegam aos rios podem:",
+      a: "Alterar a reprodução de peixes e de outros animais aquáticos",
+      w: ["Purificar a água, por serem substâncias do próprio corpo", "Evaporar logo após chegar ao rio, sem deixar nenhum efeito", "Mudar só a cor da água, sem afetar os seres vivos"],
+      e: "Hormônios sintéticos, como o etinilestradiol, agem em concentrações muito baixas. Estudos associam esses resíduos à feminização de peixes machos e a falhas na reprodução." },
+    { tag: "PEGADINHA", q: "Na hora do descarte, o que fazer com a caixinha de papel e a bula?",
+      a: "Se estiverem limpas, em geral vão para a coleta seletiva; o remédio, na embalagem primária, vai ao coletor",
+      w: ["São resíduo perigoso e por isso nunca podem ser recicladas, em nenhuma situação", "Tirar os comprimidos da cartela e jogar tudo junto na coleta seletiva", "Jogar a caixa no vaso sanitário, porque o papel se desfaz na água"],
+      e: "Caixa e bula são embalagens secundárias: não têm contato com o medicamento e, em geral, podem seguir para a coleta seletiva, conforme as regras do município. Cartela, frasco e bisnaga são a embalagem primária e vão com o medicamento para o coletor." },
+    { tag: "PEGADINHA", q: "Sobrou antibiótico de um tratamento que já terminou, e ele ainda está na validade. Qual é a melhor atitude?",
+      a: "Não usar nem repassar sem orientação profissional e, sem indicação de uso, levar ao ponto de coleta",
+      w: ["Guardar em casa para usar na próxima infecção com sintomas parecidos", "Dar a um vizinho que está com os mesmos sintomas que você teve", "Jogar no lixo comum, já que ele ainda não venceu e não oferece risco"],
+      e: "Estar na validade não torna o uso seguro sem avaliação. Antibiótico exige prescrição, e o uso indevido favorece a resistência bacteriana. Se não há indicação de uso, o destino é o ponto de coleta." },
+    { q: "O que é a logística reversa de medicamentos?",
+      a: "O caminho de volta do medicamento descartado, do consumidor à farmácia, ao distribuidor e ao fabricante, até a destinação adequada",
+      w: ["A devolução do medicamento na farmácia para receber de volta o dinheiro pago", "A entrega de medicamentos na casa do cliente por aplicativos de farmácia", "O reaproveitamento de medicamentos vencidos, que são reembalados para nova venda"],
+      e: "Na logística reversa, o resíduo volta pela cadeia que o produziu. Ela está prevista na Política Nacional de Resíduos Sólidos e, para medicamentos domiciliares, foi regulamentada pelo Decreto nº 10.388/2020." },
+    { tag: "DIFÍCIL", q: "Qual lei instituiu a Política Nacional de Resíduos Sólidos, base da logística reversa no Brasil?",
+      a: "Lei nº 12.305/2010",
+      w: ["Lei nº 8.080/1990", "Lei nº 9.782/1999", "Lei nº 13.021/2014"],
+      e: "A Lei nº 12.305/2010 instituiu a PNRS. As outras também são da área da saúde: a 8.080/1990 trata do SUS, a 9.782/1999 criou a Anvisa e a 13.021/2014 trata do exercício e da fiscalização das atividades farmacêuticas." },
+    { tag: "PEGADINHA", q: "O Decreto nº 10.388/2020 trata da logística reversa de quais produtos?",
+      a: "Medicamentos domiciliares de uso humano, vencidos ou em desuso, e suas embalagens",
+      w: ["Medicamentos de uso veterinário vencidos ou em desuso", "Todos os resíduos gerados por hospitais e clínicas", "Somente as embalagens vazias, sem os medicamentos"],
+      e: "O decreto trata de medicamentos domiciliares de uso humano, industrializados e manipulados, e de suas embalagens. Resíduos de serviços de saúde, como os de hospitais, seguem regras próprias." }
+  ];
+  const TOTAL = QUESTIONS.length, LIMIT = 20, LETTERS = ["A", "B", "C", "D"];
+  const RANKS = [
+    { min: 8, name: "Especialista em Descarte Consciente", tint: "#ffd65a",
+      msg: "Excelente! Você domina o descarte consciente e escapou das pegadinhas. Agora ajude outras pessoas a fazer o mesmo." },
+    { min: 5, name: "Guardião Ambiental", tint: "#5fd08a",
+      msg: "Bom trabalho! Você já sabe o essencial para descartar medicamentos com segurança. Compartilhe o que aprendeu com sua família." },
+    { min: 0, name: "Aprendiz do Descarte", tint: "#5fd0c8",
+      msg: "Toda missão começa com o primeiro passo. Revise a Fase 1 e tente de novo: cada acerto ajuda a proteger rios, solo e pessoas." }
+  ];
+
+  /* ---------- Elementos ---------- */
+  const $ = id => document.getElementById(id);
+  const qStart = $("qStart"), qPlay = $("qPlay"), qEnd = $("qEnd");
+  const tbar = $("tbar"), tnum = $("tnum"), tstatus = $("tstatus");
+  const optsEl = $("opts"), feedback = $("feedback"), nextBtn = $("nextBtn"), restartBtn = $("restartBtn");
+  for (let i = 0; i < LIMIT; i++) tbar.appendChild(document.createElement("i"));
+  const segs = [...tbar.children];
+
+  const state = { i: 0, score: 0, hits: 0, log: [], deck: [], phase: "idle", voiceOn: true, sfxOn: true, lastSec: LIMIT };
+
+  /* ---------- Voz (pt-BR) ---------- */
+  const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
+  let voice = null, speakToken = 0, safetyTimer = null;
+  const voiceInfo = $("voiceInfo");
+  function pickVoice() {
+    if (!synth) { voiceInfo.textContent = "Este navegador não tem leitura em voz alta. O quiz funciona normalmente, sem áudio."; return; }
+    const vs = synth.getVoices();
+    const lang = v => (v.lang || "").replace("_", "-").toLowerCase();
+    const prefer = arr => arr.find(v => /google|francisca|luciana|thalita|antonio|natural|online/i.test(v.name)) || arr[0];
+    const br = vs.filter(v => lang(v) === "pt-br"), pt = vs.filter(v => lang(v).startsWith("pt"));
+    voice = br.length ? prefer(br) : pt.length ? prefer(pt) : null;
+    if (voice) voiceInfo.textContent = (br.length ? "Voz em português do Brasil: " : "Voz em português: ") + voice.name;
+    else if (vs.length) voiceInfo.textContent = "Nenhuma voz em português encontrada neste aparelho. O navegador tentará ler em pt-BR; se não conseguir, o quiz segue sem áudio.";
+    else voiceInfo.textContent = "Carregando vozes do navegador…";
+  }
+  if (synth) { pickVoice(); synth.addEventListener?.("voiceschanged", pickVoice); setTimeout(pickVoice, 1200); } else pickVoice();
+
+  const forSpeech = t => t.replace(/nº/g, "número").replace(/(\d+\.\d+)\/(\d{4})/g, "$1 de $2").replace(/\bpts\b/g, "pontos");
+
+  function stopSpeech() { speakToken++; clearTimeout(safetyTimer); if (synth) synth.cancel(); }
+  function speak(chunks, done) {
+    stopSpeech();
+    const token = speakToken;
+    let finished = false;
+    const finish = () => {
+      if (finished || token !== speakToken) return;
+      finished = true; clearTimeout(safetyTimer);
+      if (done) done();
+    };
+    if (!state.voiceOn || !synth) { if (done) done(); return; }
+    // Segurança: se o navegador não avisar o fim da fala, o jogo segue mesmo assim.
+    const chars = chunks.join(" ").length;
+    safetyTimer = setTimeout(finish, chars * 85 + 3000);
+    const queue = () => {
+      if (token !== speakToken) return;
+      chunks.forEach((text, idx) => {
+        const u = new SpeechSynthesisUtterance(forSpeech(text));
+        u.lang = voice ? voice.lang.replace("_", "-") : "pt-BR";
+        if (voice) u.voice = voice;
+        u.rate = 1; u.pitch = 1;
+        if (idx === chunks.length - 1) u.onend = finish;
+        u.onerror = ev => { if (ev.error !== "interrupted" && ev.error !== "canceled") finish(); };
+        synth.speak(u);
+      });
+    };
+    if (synth.speaking || synth.pending) setTimeout(queue, 80); else queue();
+  }
+
+  /* ---------- Efeitos sonoros (8 bits) ---------- */
+  let actx = null;
+  function beep(freq, dur, when = 0, vol = 0.05, type = "square") {
+    if (!state.sfxOn) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = actx.currentTime + when, o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch (err) { /* sem áudio disponível */ }
+  }
+  const sfx = {
+    ok: () => { beep(660, .09); beep(880, .09, .09); beep(1320, .16, .18); },
+    bad: () => { beep(300, .14); beep(200, .26, .14); },
+    tick: () => beep(1000, .04, 0, .03),
+    win: () => [523, 659, 784, 1046].forEach((f, i) => beep(f, .14, i * .13))
+  };
+
+  /* ---------- Controles de voz e som ---------- */
+  const voiceTog = $("voiceTog"), sfxTog = $("sfxTog");
+  voiceTog.addEventListener("click", () => {
+    state.voiceOn = !state.voiceOn;
+    voiceTog.setAttribute("aria-pressed", state.voiceOn);
+    voiceTog.textContent = state.voiceOn ? "VOZ: LIGADA" : "VOZ: DESLIGADA";
+    if (!state.voiceOn) {
+      stopSpeech();
+      if (state.phase === "reading") startTimer();
+    }
+  });
+  sfxTog.addEventListener("click", () => {
+    state.sfxOn = !state.sfxOn;
+    sfxTog.setAttribute("aria-pressed", state.sfxOn);
+    sfxTog.textContent = state.sfxOn ? "SONS: LIGADOS" : "SONS: DESLIGADOS";
+  });
+
+  /* ---------- Cronômetro ---------- */
+  let tickId = null, deadline = 0;
+  function drawTimer(rem) {
+    const sec = Math.ceil(rem);
+    segs.forEach((s, idx) => s.classList.toggle("off", idx >= sec));
+    tnum.textContent = sec;
+    tbar.classList.toggle("warn", sec <= 10 && sec > 5);
+    tbar.classList.toggle("danger", sec <= 5);
+    tnum.classList.toggle("danger", sec <= 5);
+    tbar.parentElement.setAttribute("aria-label", "Tempo restante: " + sec + " segundos");
+    if (state.phase === "answering" && sec !== state.lastSec && sec <= 5 && sec > 0) sfx.tick();
+    state.lastSec = sec;
+  }
+  function startTimer() {
+    if (state.phase !== "reading") return;
+    state.phase = "answering";
+    clearTimeout(safetyTimer);
+    tbar.classList.remove("wait");
+    tstatus.textContent = "Valendo! Você tem 20 segundos.";
+    deadline = performance.now() + LIMIT * 1000;
+    state.lastSec = LIMIT;
+    drawTimer(LIMIT);
+    clearInterval(tickId);
+    tickId = setInterval(() => {
+      const rem = Math.max(0, (deadline - performance.now()) / 1000);
+      drawTimer(rem);
+      if (rem <= 0) resolve(-1);
+    }, 100);
+  }
+  function stopTimer() { clearInterval(tickId); tickId = null; }
+  function remaining() {
+    if (state.phase === "reading") return LIMIT;
+    return Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+  }
+
+  /* ---------- Fluxo do quiz ---------- */
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function show(screen) {
+    [qStart, qPlay, qEnd].forEach(s => { s.hidden = s !== screen; });
+  }
+  function startQuiz() {
+    stopSpeech(); stopTimer();
+    state.i = 0; state.score = 0; state.hits = 0; state.log = [];
+    state.deck = QUESTIONS.map(Q => {
+      const opts = shuffle([{ t: Q.a, ok: true }, ...Q.w.map(t => ({ t, ok: false }))]);
+      return { ...Q, opts, correct: opts.findIndex(o => o.ok) };
+    });
+    resetRestart();
+    show(qPlay);
+    const top = qPlay.closest(".quiz").getBoundingClientRect().top;
+    if (top < 0 || top > innerHeight * .5) go("quiz");
+    loadQuestion();
+  }
+  function questionSpeech(Q) {
+    return [`Pergunta ${state.i + 1}. ${Q.q}`, ...Q.opts.map((o, k) => `Alternativa ${LETTERS[k]}. ${o.t}.`)];
+  }
+  function loadQuestion() {
+    const Q = state.deck[state.i];
+    stopTimer();
+    state.phase = "reading";
+    $("qCount").innerHTML = `PERGUNTA <b>${state.i + 1}</b>/${TOTAL}`;
+    $("qScore").innerHTML = `PONTOS <b>${state.score}</b>`;
+    const tag = $("qTag");
+    tag.hidden = !Q.tag; tag.textContent = Q.tag || "";
+    $("qText").textContent = Q.q;
+    optsEl.innerHTML = "";
+    Q.opts.forEach((o, k) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "opt pix";
+      b.innerHTML = `<span class="key">${LETTERS[k]}</span><span></span>`;
+      b.lastChild.textContent = o.t;
+      b.setAttribute("aria-label", `Alternativa ${LETTERS[k]}: ${o.t}`);
+      b.addEventListener("click", () => resolve(k));
+      optsEl.appendChild(b);
+    });
+    feedback.hidden = true;
+    feedback.className = "feedback";
+    tbar.classList.add("wait");
+    drawTimer(LIMIT);
+    if (state.voiceOn && synth) {
+      tstatus.textContent = "Ouvindo a pergunta… o cronômetro começa logo após a leitura.";
+      speak(questionSpeech(Q), startTimer);
+    } else {
+      startTimer();
+    }
+  }
+  function resolve(choice) {
+    if (state.phase !== "reading" && state.phase !== "answering") return;
+    const Q = state.deck[state.i];
+    const left = remaining();
+    stopTimer(); stopSpeech();
+    state.phase = "feedback";
+    const ok = choice === Q.correct, timeout = choice === -1;
+    let gained = 0;
+    if (ok) { gained = 100 + left * 5; state.score += gained; state.hits++; }
+    state.log.push({ q: Q.q, ok, timeout, picked: choice >= 0 ? Q.opts[choice].t : null, right: Q.opts[Q.correct].t });
+    [...optsEl.children].forEach((b, k) => {
+      b.disabled = true;
+      if (k === Q.correct) b.classList.add("correct");
+      else if (k === choice) b.classList.add("wrong");
+      else b.classList.add("dim");
+    });
+    $("qScore").innerHTML = `PONTOS <b>${state.score}</b>`;
+    if (timeout) { drawTimer(0); }
+    const title = ok ? `CORRETO! +${gained} PONTOS` : timeout ? "TEMPO ESGOTADO!" : "INCORRETO!";
+    tstatus.textContent = ok ? `Resposta certa com ${left} segundos de sobra.` : timeout ? "O tempo acabou." : "Essa não era a alternativa certa.";
+    feedback.classList.add(ok ? "ok" : "bad");
+    $("fTitle").textContent = title;
+    $("fText").textContent = (ok ? "" : `Resposta certa: ${LETTERS[Q.correct]}) ${Q.opts[Q.correct].t}. `) + Q.e;
+    nextBtn.textContent = state.i + 1 < TOTAL ? "Próxima pergunta" : "Ver resultado";
+    feedback.hidden = false;
+    ok ? sfx.ok() : sfx.bad();
+    nextBtn.focus({ preventScroll: true });
+    const r = feedback.getBoundingClientRect();
+    if (r.bottom > innerHeight) feedback.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+    speak(feedbackSpeech(Q, ok, timeout));
+  }
+  function feedbackSpeech(Q, ok, timeout) {
+    const head = ok ? "Resposta correta!" : timeout ? "Tempo esgotado." : "Resposta incorreta.";
+    return ok ? [head, Q.e] : [head, `A resposta certa é a alternativa ${LETTERS[Q.correct]}: ${Q.opts[Q.correct].t}.`, Q.e];
+  }
+  function next() {
+    if (state.phase !== "feedback") return;
+    stopSpeech();
+    state.i++;
+    if (state.i < TOTAL) { loadQuestion(); go("quiz"); }
+    else finish();
+  }
+  function finish() {
+    state.phase = "done";
+    stopTimer();
+    const rank = RANKS.find(r => state.hits >= r.min);
+    $("badge").innerHTML = spriteSVG("trophy", 7, { y: rank.tint });
+    $("badge").style.borderColor = rank.tint;
+    $("rank").textContent = rank.name;
+    $("final").textContent = `${state.hits} de ${TOTAL} acertos · ${state.score} pontos`;
+    $("msg").textContent = rank.msg;
+    const list = $("reviewList");
+    list.innerHTML = "";
+    state.log.forEach(l => {
+      const li = document.createElement("li");
+      const st = document.createElement("span");
+      st.className = "st " + (l.ok ? "ok" : "bad");
+      st.textContent = l.ok ? "ACERTOU" : l.timeout ? "TEMPO" : "ERROU";
+      const q = document.createElement("strong"); q.textContent = l.q;
+      const a = document.createElement("p"); a.className = "muted small"; a.textContent = "Resposta certa: " + l.right;
+      li.append(st, q, a);
+      list.appendChild(li);
+    });
+    $("review").open = false;
+    show(qEnd);
+    go("quiz");
+    sfx.win();
+    speak([`Missão cumprida! Você acertou ${state.hits} de ${TOTAL} perguntas e fez ${state.score} pontos.`, `Sua conquista: ${rank.name}.`, rank.msg]);
+    $("againBtn").focus({ preventScroll: true });
+  }
+
+  /* Reiniciar com confirmação em dois cliques (dialogs nativos não aparecem aqui) */
+  let restartArmed = null;
+  function resetRestart() { clearTimeout(restartArmed); restartArmed = null; restartBtn.textContent = "Reiniciar"; }
+  restartBtn.addEventListener("click", () => {
+    if (restartArmed) { resetRestart(); startQuiz(); return; }
+    restartBtn.textContent = "Confirmar reinício?";
+    restartArmed = setTimeout(resetRestart, 3500);
+  });
+
+  $("startBtn").addEventListener("click", startQuiz);
+  $("againBtn").addEventListener("click", startQuiz);
+  nextBtn.addEventListener("click", next);
+  $("replayBtn").addEventListener("click", () => {
+    const Q = state.deck[state.i];
+    if (!Q || !synth || !state.voiceOn) return;
+    if (state.phase === "reading") speak(questionSpeech(Q), startTimer);
+    else if (state.phase === "answering") speak(questionSpeech(Q));
+    else if (state.phase === "feedback") { const l = state.log[state.log.length - 1]; speak(feedbackSpeech(Q, l.ok, l.timeout)); }
+  });
+
+  document.addEventListener("keydown", e => {
+    if (qPlay.hidden || e.target.closest("input, textarea") || e.ctrlKey || e.metaKey || e.altKey) return;
+    const map = { "1": 0, "2": 1, "3": 2, "4": 3, a: 0, b: 1, c: 2, d: 3 };
+    const k = e.key.toLowerCase();
+    if ((state.phase === "reading" || state.phase === "answering") && k in map) { e.preventDefault(); resolve(map[k]); }
+    else if (state.phase === "feedback" && e.key === "Enter" && e.target !== nextBtn) { e.preventDefault(); next(); }
+  });
+
+  drawTimer(LIMIT);
+})();
+</script>
+</html>
